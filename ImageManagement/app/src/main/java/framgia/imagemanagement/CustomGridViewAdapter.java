@@ -24,10 +24,10 @@ public class CustomGridViewAdapter extends BaseAdapter {
     ImageProcessing imageProcess;
     private static LayoutInflater inflater = null;
 
-    public CustomGridViewAdapter(MainActivity fromActivity, ArrayList<String> imgList) {
+    public CustomGridViewAdapter(Context context, ArrayList<String> imgList) {
         // TODO Auto-generated constructor stub
         imageList = imgList;
-        context = fromActivity;
+        this.context = context;
         imageProcess = new ImageProcessing();
         inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -77,5 +77,4 @@ public class CustomGridViewAdapter extends BaseAdapter {
         }
         return rowView;
     }
-
 }

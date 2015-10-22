@@ -1,10 +1,18 @@
 <resources>
     <string name="app_name">ImageManagement</string>
     <string name="action_settings">Settings</string>
-    <string name="photo_folder">QuyenNH</string>
+    <string name="photo_folder">ImageSearchPhotos</string>
     <string name="search">Search</string>
+    <string name="onlinesearch">Online Search</string>
     <string name="intent_image_list">ImageList</string>
     <string name="intent_current_image">CurentImage</string>
     <string name="image_filepath_format">%1$s/%2$s/%3$s</string>
     <string name="folder_filepath_format">%1$s/%2$s</string>
+    <string name="vDet">View detail</string>
+    <string name="cache_dirname">GoogleImgApp_Cache</string>
+    <string name="wait_msg">please wait...</string>
+    <string name="fram_web">http://recruit.framgia.vn/</string>
+    <string name="base_google_image_api_request_link">https://ajax.googleapis.com/ajax/services/search/images?v=1</string>
+    <string name="imageUrl">imageUrl</string>
+    <string name="imageTitle">imageTitle</string>
 </resources>

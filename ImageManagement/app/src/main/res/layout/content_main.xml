@@ -26,7 +26,13 @@
         android:layout_alignBottom="@+id/local_editText_Search"
         android:layout_toEndOf="@+id/local_editText_Search"
         android:text="@string/search" />
-
+    <Button
+        android:id="@+id/buttonOnline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/local_editText_Search"
+        android:layout_toEndOf="@+id/local_button_search"
+        android:text="@string/onlinesearch" />
     <GridView
         android:id="@+id/loCal_gridview"
         android:layout_width="wrap_content"

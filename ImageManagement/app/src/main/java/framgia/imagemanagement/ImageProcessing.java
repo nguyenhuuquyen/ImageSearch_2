@@ -6,7 +6,6 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.util.Log;
 
-import java.util.logging.Logger;
 
 /**
  * Created by FRAMGIA\nguyen.huu.quyen on 19/10/2015.
