@@ -1,0 +1,13 @@
+.gradle
+/local.properties
+.DS_Store
+/build
+.idea/
+.idea/*.*
+*.iml
+/Bomberdier
+.gitignore~
+app/src/main/gen/
+*/gen/
+gradlew.*
+gradlew
