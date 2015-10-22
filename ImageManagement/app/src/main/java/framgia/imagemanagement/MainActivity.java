@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     GridView localGridView;
     EditText localEditTextSearch;
     Button localButtonSearch;
+    Button onlineModeButton;
     ArrayList<String> localImageList;
     ArrayList<String> localResultImageList;
 
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        createLocalFolder();
         setfindViewById();
         listAllFileInDownloadFolder();
         displayListImage(localImageList);
@@ -36,6 +39,14 @@ public class MainActivity extends AppCompatActivity {
         localImageList = new ArrayList<>();
         localResultImageList = new ArrayList<>();
         //GridView
+        onlineModeButton = (Button) findViewById(R.id.buttonOnline);
+        onlineModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, OnlineActivity.class);
+                startActivity(intent);
+            }
+        });
         localGridView = (GridView) findViewById(R.id.loCal_gridview);
         localGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -89,6 +100,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void createLocalFolder() {
+        DataCopyer dataCopyer = new DataCopyer(this);
+        dataCopyer.copyFileOrDir(getString(R.string.photo_folder));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -110,4 +126,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

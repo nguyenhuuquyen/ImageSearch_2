@@ -24,13 +24,14 @@ public class CustomGridViewAdapter extends BaseAdapter {
     ImageProcessing imageProcess;
     private static LayoutInflater inflater = null;
 
-    public CustomGridViewAdapter(MainActivity fromActivity, ArrayList<String> imgList) {
+    public CustomGridViewAdapter(Context fromActivity, ArrayList<String> imgList) {
         // TODO Auto-generated constructor stub
         imageList = imgList;
         context = fromActivity;
         imageProcess = new ImageProcessing();
         inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
     }
 
     @Override
@@ -61,10 +62,14 @@ public class CustomGridViewAdapter extends BaseAdapter {
         // TODO Auto-generated method stub
         Holder holder = new Holder();
         View rowView;
+
+
         rowView = inflater.inflate(R.layout.local_gridview, null);
         holder.imageName = (TextView) rowView.findViewById(R.id.imageName);
         holder.imageView = (ImageView) rowView.findViewById(R.id.imageView);
+
         holder.imageName.setText(imageList.get(position).toString());
+
         //Display several data only
         String imagePath = context.getString(R.string.image_filepath_format, Environment.getExternalStorageDirectory().toString(), context.getString(R.string.photo_folder), imageList.get(position).toString());
         File imgFile = new File(imagePath);
@@ -75,6 +80,7 @@ public class CustomGridViewAdapter extends BaseAdapter {
         } else {
             holder.imageView.setImageResource(R.drawable.image_icon);
         }
+
         return rowView;
     }
 
