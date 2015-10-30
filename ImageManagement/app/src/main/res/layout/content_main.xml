@@ -35,8 +35,8 @@
         android:text="@string/onlinesearch" />
     <GridView
         android:id="@+id/loCal_gridview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/image_hight"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/local_editText_Search"
         android:numColumns="3" />

@@ -15,4 +15,7 @@
     <string name="base_google_image_api_request_link">https://ajax.googleapis.com/ajax/services/search/images?v=1</string>
     <string name="imageUrl">imageUrl</string>
     <string name="imageTitle">imageTitle</string>
+    <string name="download">Download</string>
+    <string name="loadMore">Load More</string>
+    <string name="localSearch">Local Search</string>
 </resources>

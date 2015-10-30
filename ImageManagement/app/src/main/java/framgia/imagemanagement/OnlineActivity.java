@@ -6,16 +6,17 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,29 +30,31 @@ public class OnlineActivity extends Activity {
     private final static byte imageResultNum = 8;
     private GridView gridView;
     // adapter for gridView
-    public OnlineImageAdapter imageAdapter = null;
-    // save bundle backup for MainActivity
-    public Bundle mBackupBundle;
+    public OnlineImageAdapter imageAdapter;
     // string to search
     private String strSearch;
-    // string from preview Searched process, save to compare to present string search
-    private String previewStrSearch;
     // string from edited text
     private EditText editText;
     // search button
     private Button searchBttn;
+    //load more button
+    private Button loadMoreButtn;
+    //local search button
+    private Button localSearchButton;
     // list of images
     private ArrayList<Object> listImageObj;
     // start index for load the next page, startIndex = pageNum*8, n is number of pages
     private byte startIndex;
-    // number of page
-    private byte numPage = 4;
+    private int mVisibleThreshold = 5;
+    private int mCurrentPage = 0;
+    private int mPreviousTotal = 0;
+    private boolean mLoading = true;
+    private boolean mLastPage = false;
+    private final static int ITEMS_PPAGE = 16;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //save savedInstanceState into myBackupBundle
-        mBackupBundle = savedInstanceState;
         // set view as activity_main.xml
         setContentView(R.layout.online_image_finder);
         // set view to controller
@@ -62,32 +65,62 @@ public class OnlineActivity extends Activity {
     public void setFindViewById() {
         // can edit the text in text box
         editText = (EditText) findViewById(R.id.editTextForSearch);
-        // can click the search button
-        searchBttn = (Button) findViewById(R.id.search_button);
-        searchBttn.setOnClickListener(new View.OnClickListener() {
+        //grid view
+        gridView = (GridView) findViewById(R.id.gridViewOnline);
+        //gridView.setOnScrollListener(this);
+        // setup event to see image's detail
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                // get string from edit text
-                strSearch = editText.getText().toString();
-                listImageObj.clear();
-                startIndex = 0;
-                // save value and clear search result if needed
-                if (!previewStrSearch.equals(strSearch)) {
-                    previewStrSearch = strSearch;
-                }
-                // encode that key work to add to the link
-                strSearch = Uri.encode(strSearch);
-                (new OnlineActivity.getImagesTask()).execute(new Void[0]);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                showImagedetail(position);
             }
         });
+        // can click the search button
+        searchBttn = (Button) findViewById(R.id.online_search_button);
+        searchBttn.setOnClickListener(clickListener);
+        loadMoreButtn = (Button) findViewById(R.id.buttonLoadMore);
+        loadMoreButtn.setOnClickListener(clickListener);
+        loadMoreButtn.setVisibility(View.INVISIBLE);
+        localSearchButton = (Button)findViewById(R.id.buttonBackLocal);
+        localSearchButton.setOnClickListener(clickListener);
     }
+    private View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.buttonBackLocal:
+                    Intent intent = new Intent(OnlineActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.buttonLoadMore:
+                    if (startIndex != 0) {
+                        listImageObj.clear();
+                        (new OnlineActivity.getImagesTask()).execute(new Void[0]);
+                    }
+                    break;
+                case R.id.online_search_button:
+                    // get string from edit text
+                    strSearch = editText.getText().toString();
 
+                    if (!strSearch.equals("")) {
+                        listImageObj.clear();
+                        startIndex = 0;
+                        loadMoreButtn.setVisibility(View.VISIBLE);
+                        // encode that key work to add to the link
+                        strSearch = Uri.encode(strSearch);
+                        (new OnlineActivity.getImagesTask()).execute(new Void[0]);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
     private void initValue() {
         // init image of index (ex: in page 1, the first image's index is 0)
         startIndex = 0;
         // init list of image's object
         listImageObj = new ArrayList<>();
-        previewStrSearch = "";
     }
 
     public void showImagedetail(int position) {
@@ -101,22 +134,7 @@ public class OnlineActivity extends Activity {
         startActivity(intent);
     }
 
-    private void setGridViewContent(ArrayList<Object> listImageObj) {
-        gridView = (GridView) findViewById(R.id.gridViewOnline);
-        //setup data source for Adapter
-        imageAdapter = new OnlineImageAdapter(this, listImageObj);
-        // set image's adapter to gridView
-        gridView.setAdapter(imageAdapter);
-        // setup event to see image's detail
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showImagedetail(position);
-            }
-        });
-    }
-
-    public ArrayList<Object> getImageList(JSONArray resultArray) {
+    public ArrayList<Object> getImageListDetail(JSONArray resultArray) {
         // get a list of image
         ArrayList listImages = new ArrayList();
         try {
@@ -145,10 +163,6 @@ public class OnlineActivity extends Activity {
         JSONObject json;
         ProgressDialog dialog;
         ArrayList<Object> list;
-
-        public getImagesTask() {
-        }
-
         protected void onPreExecute() {
             super.onPreExecute();
             // show a dialog tell to user wait for feedback's result
@@ -159,7 +173,6 @@ public class OnlineActivity extends Activity {
             createJsonObjFromUrl();
             return null;
         }
-
         protected void createJsonObjFromUrl() {
             try {
                 StringBuilder builder = new StringBuilder();
@@ -181,7 +194,6 @@ public class OnlineActivity extends Activity {
                 BufferedReader reader =
                         new BufferedReader(new InputStreamReader(e.getInputStream()));
                 while ((line = reader.readLine()) != null) {
-                    Log.e("String", line);
                     builder.append(line);
                 }
                 // create a json object
@@ -194,7 +206,6 @@ public class OnlineActivity extends Activity {
                 var9.printStackTrace();
             }
         }
-
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             // if a dialog is showing
@@ -202,14 +213,16 @@ public class OnlineActivity extends Activity {
                 // dismiss that dialog
                 this.dialog.dismiss();
             }
-            getImageList();
-            for (int i = 0; i < list.size(); i++) {
-                listImageObj.add(getImageList().get(i));
+            ArrayList<Object> tempList = getImageList();
+            for (int i = 0; i < tempList.size(); i++) {
+                listImageObj.add(tempList.get(i));
             }
             // show image to the view
-            setGridViewContent(listImageObj);
+            //setup data source for Adapter
+            imageAdapter = new OnlineImageAdapter(OnlineActivity.this, listImageObj);
+            // set image's adapter to gridView
+            gridView.setAdapter(imageAdapter);
         }
-
         protected ArrayList<Object> getImageList() {
             list = new ArrayList<>();
             try {
@@ -218,11 +231,12 @@ public class OnlineActivity extends Activity {
                 // get result of array from json object
                 JSONArray resultArray = e.getJSONArray("results");
                 // get a list of image from result array
-                list = OnlineActivity.this.getImageList(resultArray);
+                list = getImageListDetail(resultArray);
             } catch (JSONException var4) {
                 var4.printStackTrace();
             }
             return list;
         }
     }
+
 }

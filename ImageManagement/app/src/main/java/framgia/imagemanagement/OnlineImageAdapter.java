@@ -23,6 +23,12 @@ public class OnlineImageAdapter extends BaseAdapter {
         this.listImageObj = listImageObj;
     }
 
+    public void addImage(ArrayList<Object> addlist) {
+        for (int i = 0; i < addlist.size(); i++) {
+            listImageObj.add(addlist.get(i));
+        }
+    }
+
     @Override
     public int getCount() {
         return listImageObj.size();
@@ -49,7 +55,7 @@ public class OnlineImageAdapter extends BaseAdapter {
             imgView.setPadding(10, 10, 10, 10);
             GoogleImageBean imageBean = (GoogleImageBean) this.listImageObj.get(position);
             Picasso.with(mContext)
-                    .load(imageBean.getThumbUrl())
+                    .load(imageBean.getUrl())
                     .into(imgView);
         } else {
             imgView = (ImageView) convertView;
